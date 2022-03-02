@@ -200,7 +200,7 @@ The non-strict partial order over the type inference lattice.
             end
             for i in 1:nfields(a.val)
                 # XXX: let's handle varargs later
-                isdefined(a.val, i) || return false
+                isdefined(a.val, i) || continue # since ∀ T Union{} ⊑ T
                 ⊑(Const(getfield(a.val, i)), b.fields[i]) || return false
             end
             return true
