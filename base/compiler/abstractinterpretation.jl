@@ -260,7 +260,7 @@ function find_matching_methods(argtypes::Vector{Any}, @nospecialize(atype), meth
             mt === nothing && return FailedMethodMatch("Could not identify method table for call")
             mt = mt::Core.MethodTable
             matches = findall(sig_n, method_table; limit = max_methods)
-            if matches === missing
+            if matches === nothing
                 return FailedMethodMatch("For one of the union split cases, too many methods matched")
             end
             push!(infos, MethodMatchInfo(matches))
@@ -296,7 +296,7 @@ function find_matching_methods(argtypes::Vector{Any}, @nospecialize(atype), meth
         end
         mt = mt::Core.MethodTable
         matches = findall(atype, method_table; limit = max_methods)
-        if matches === missing
+        if matches === nothing
             # this means too many methods matched
             # (assume this will always be true, so we don't compute / update valid age in this case)
             return FailedMethodMatch("Too many methods matched")
