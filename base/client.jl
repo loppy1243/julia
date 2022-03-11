@@ -61,6 +61,20 @@ function repl_cmd(cmd, out)
         @static if !Sys.iswindows()
             if shell_name == "fish"
                 shell_escape_cmd = "begin; $(shell_escape_posixly(cmd)); and true; end"
+            elseif shell_name == "elvish"
+                versionbuf = IOBuffer()
+                run(pipeline(`$shell -version`, versionbuf))
+                # versionbuf should now hold a string of the form "X.Y.Z\n"
+                version = split(String(take!(versionbuf)), ".")
+
+                # Elvish version 0.18.0 and above changes syntax from "except" to "catch"
+                catch_except = if version[1] == "0" && parse(Int, version[2]) >= 18
+                    "catch"
+                else
+                    "except"
+                end
+
+                shell_escape_cmd = "try { $(shell_escape_posixly(cmd)) } $catch_except { }"
             else
                 shell_escape_cmd = "($(shell_escape_posixly(cmd))) && true"
             end
